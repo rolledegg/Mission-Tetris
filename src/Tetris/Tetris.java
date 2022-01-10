@@ -17,10 +17,10 @@ public class Tetris extends JFrame  {
 	private static Font boldFont = new Font("Arial", Font.BOLD, 20);
 	private static Font boldSmallFont = new Font("Arial", Font.BOLD, 16);
 	private static Font plaintFont = new Font("Arial", Font.PLAIN, 19);
-	private static Font gameOverFont = new Font("SansSerif", Font.BOLD, 30);
+	private static Font missionFont = new Font("Arial", Font.BOLD, 24);
 //	private static Font gameOverFont = new Font("Arial", Font.BOLD, 30);
 	private JLabel missionSuccess;
-	public JTextField scoreTexField,lineTextField;
+	public JTextField scoreTextField,lineTextField;
 	public JPanel missionPan;
 	public JLabel timeLabel, linesLabel;
 	
@@ -34,7 +34,7 @@ public class Tetris extends JFrame  {
 		//Container c = getContentPane();
 		setLayout(null);
 
-		missionSuccess = new JLabel("Success 1 ", JLabel.LEFT);
+		missionSuccess = new JLabel("Success 0 ", JLabel.LEFT);
 		missionSuccess.setFont(boldFont);
 		missionSuccess.setBounds(290,220,120,30);
 		add(missionSuccess);
@@ -44,15 +44,15 @@ public class Tetris extends JFrame  {
 		score.setBounds(290,260,80,30);
 		add(score);
 		
-		scoreTexField = new JTextField(7);
-		scoreTexField.setHorizontalAlignment(JTextField.RIGHT);
-		scoreTexField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		scoreTexField.setFont(plaintFont);
-		scoreTexField.setText("0");
-		scoreTexField.setForeground(Color.white);
-		scoreTexField.setBackground(Color.black);
-		scoreTexField.setBounds(290,295,145,22);
-		add(scoreTexField);
+		scoreTextField = new JTextField(7);
+		scoreTextField.setHorizontalAlignment(JTextField.RIGHT);
+		scoreTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		scoreTextField.setFont(plaintFont);
+		scoreTextField.setText("0");
+		scoreTextField.setForeground(Color.white);
+		scoreTextField.setBackground(Color.black);
+		scoreTextField.setBounds(290,295,145,22);
+		add(scoreTextField);
 
 		JLabel lines = new JLabel("Lines: ", JLabel.LEFT);
 		lines.setFont(boldFont);
@@ -68,39 +68,46 @@ public class Tetris extends JFrame  {
 		lineTextField.setBackground(Color.black);
 		lineTextField.setBounds(290,370,145,22);
 		add(lineTextField);
-		
-		var board = new Board(this);
-		board.setBounds(30,70,230,460);
-		add(board);
-		board.start();
-
-		//Thread mission = new Thread(new Mission(5,5));
-		//mission.setBounds(70,220,100,100);
-		//add(mission);
 
 		missionPan= new JPanel();
 		missionPan.setLayout(null);
-		missionPan.setBounds(290,70,145,145);
+		missionPan.setBounds(290,70,145,140);
 		missionPan.setBackground(Color.LIGHT_GRAY);
 		
 		JLabel label1 = new JLabel("MISSION ", JLabel.LEFT);
-		label1.setFont(boldFont);
-		label1.setBounds(30,10,80,30);
+		label1.setFont(missionFont);
+		label1.setBounds(20,20,140,30);
 		label1.setForeground(Color.red);
 		missionPan.add(label1);
 		
 		JLabel label2 = new JLabel("Time ", JLabel.LEFT);
 		label2.setFont(boldSmallFont);
-		label2.setBounds(10,40,80,30);
+		label2.setBounds(25,55,80,30);
 		missionPan.add(label2);
 		
-		timeLabel = new JLabel("", JLabel.LEFT);
+		timeLabel = new JLabel("30", JLabel.CENTER);
 		timeLabel.setFont(boldSmallFont);
-		timeLabel.setBounds(70,40,70,30);
-		timeLabel.setForeground(Color.gray);
+		timeLabel.setBounds(67,56,70,30);
+		timeLabel.setForeground(Color.gray.darker());
 		missionPan.add(timeLabel);
 		
+		JLabel label3 = new JLabel("Lines ", JLabel.LEFT);
+		label3.setFont(boldSmallFont);
+		label3.setBounds(25,90,80,30);
+		missionPan.add(label3);
+		
+		linesLabel = new JLabel("3 / 3", JLabel.CENTER);
+		linesLabel.setFont(boldSmallFont);
+		linesLabel.setBounds(67,90,70,30);
+		linesLabel.setForeground(Color.gray.darker());
+		missionPan.add(linesLabel);
+		
 		add(missionPan);
+		
+		var board = new Board(this);
+		board.setBounds(30,70,230,460);
+		add(board);
+		board.start();
 		
 		setSize(480, 600);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -117,9 +124,24 @@ public class Tetris extends JFrame  {
 		//g2.fillRect(290, 70,145,145);
 	}
 
-	JTextField getStatusBar() {
-
+	JTextField getLineTextField() {
 		return lineTextField;
+	}
+	
+	JTextField getScoreTextField() {
+		return scoreTextField;
+	}
+	
+	JLabel getSuccessCount() {
+		return missionSuccess;
+	}
+	
+	JLabel getTimeLabel() {
+		return timeLabel;
+	}
+	
+	JLabel getLineLabel() {
+		return linesLabel;
 	}
 
 	public static void main(String[] args) {

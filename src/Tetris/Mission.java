@@ -4,24 +4,31 @@ import java.awt.Font;
 
 import javax.swing.*;
 
-public class Mission  implements Runnable {
+public class Mission implements Runnable {
 	private static Font plaintFont = new Font("Arial", Font.PLAIN, 16);
 	int time, lines;
-	Tetris Parent;
+	Tetris parent;
+	Board board;
+	JLabel timeLabel, lineLabel;
 
-	public Mission(Tetris parent,int time, int lines) {
+	public Mission(Tetris parent, Board board, int time, int lines) {
 		this.time = time;
 		this.lines = lines;
-		this.Parent = parent;
+		this.parent = parent;
+		this.board = board;
+		this.timeLabel = parent.getTimeLabel();
+		this.lineLabel = parent.getLineLabel();
 	}
 
-
 	public void run() {
-		Parent.timeLabel.setText(String.valueOf(time));
-		int x= time;
-		System.out.println("running"+x);
-		for(int i = 0; i<x; i++) {
-			System.out.println("running-"+time+","+x);
+		timeLabel.setText(String.valueOf(time) + "s");
+		lineLabel.setText("0 / " + String.valueOf(lines));
+
+		int initTime = time;
+		int initLines = board.getNumLinesRemoved();
+		
+		for (int i = 0; i < initTime; i++) {
+			System.out.println("timer " + time + "/" + initTime);
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -29,8 +36,28 @@ public class Mission  implements Runnable {
 				e.printStackTrace();
 			}
 			time--;
-			Parent.timeLabel.setText(String.valueOf(time));
+			int gab = board.getNumLinesRemoved()-initLines;
+			
+			timeLabel.setText(String.valueOf(time) + "s");
+			lineLabel.setText(gab + " / " + String.valueOf(lines));
+			
+			// Mission Success
+			if (lines <= gab) {
+				board.setMissionSucces(true);
+				break;
+			}
+			
+			// Mission Fail
+			if (time == 0) {
+				board.setGameOver(true);
+			}
+			
+			//Gameover before timeout
+			if(board.getGameOver()) {
+				break;
+			}
 		}
+		System.out.println("break");
 
 	}
 

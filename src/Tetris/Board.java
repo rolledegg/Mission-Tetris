@@ -16,17 +16,22 @@ public class Board extends JPanel {
 
 	private Timer timer;
 	private boolean isFallingFinished = false;
-	public boolean gameOver = false;
+	private boolean gameOver = false;
 	private boolean isPaused = false;
 	private boolean ableRotate = true;
 	private boolean missionSucces = false;
+	public int missionSuccesCount = 0;
 	public int numLinesRemoved = 0;
 	private int curX = 0;
 	private int curY = 0;
-	private JTextField statusbar;
+	private int score = 0;
 	private Shape curPiece;
 	private Shape nextPiece;
-	Tetris parent;
+
+	private Tetris parent;
+	private JTextField lineTextField, scoreTextField;
+	private JLabel successCount;
+
 	private Tetrominoe[] board;
 
 	private static Font gameOverFont = new Font("SansSerif", Font.BOLD, 33);
@@ -41,9 +46,27 @@ public class Board extends JPanel {
 		this.requestFocus();
 		setFocusable(true);
 		setBackground(Color.black);
-		statusbar = parent.getStatusBar();
+		lineTextField = parent.getLineTextField();
+		scoreTextField = parent.getScoreTextField();
+		successCount = parent.getSuccessCount();
 
 		addKeyListener(new TAdapter());
+	}
+
+	public int getNumLinesRemoved() {
+		return numLinesRemoved;
+	}
+
+	public boolean getGameOver() {
+		return gameOver;
+	}
+
+	public void setGameOver(boolean bool) {
+		gameOver = bool;
+	}
+
+	public void setMissionSucces(boolean bool) {
+		missionSucces = bool;
 	}
 
 	private int squareWidth() {
@@ -72,20 +95,13 @@ public class Board extends JPanel {
 
 		timer = new Timer(PERIOD_INTERVAL, new GameCycle());
 		timer.start();
+
+		Thread mission = new Thread(new Mission(parent, this, 30, 1));
+		mission.start();
 	}
 
 	private void pause() {
-
 		isPaused = !isPaused;
-
-		if (isPaused) {
-
-			statusbar.setText("paused");
-		} else {
-
-			statusbar.setText(String.valueOf(numLinesRemoved));
-		}
-
 		repaint();
 	}
 
@@ -135,15 +151,19 @@ public class Board extends JPanel {
 	}
 
 	private void drawGameOver(Graphics g) {
-		g.setColor(new Color(0, 0, 0, 150));
+		g.setColor(new Color(0, 0, 0, 200));
 		g.fillRect(0, 0, getWidth(), getHeight());
 
-		g.setColor(new Color(0, 100, 100, 220));
+		g.setColor(new Color(180, 180, 180, 150));
 		g.fillRect(0, getHeight() / 2 - 35, getWidth(), 70);
 
 		g.setColor(new Color(255, 0, 0));
 		g.setFont(gameOverFont);
 		g.drawString("GAME OVER", 15, (getHeight() / 2) + 10);
+
+		g.fillRect(0, getHeight() / 2 - 42, getWidth(), 7);
+		g.fillRect(0, getHeight() / 2 +  35, getWidth(), 7);
+		
 
 	}
 
@@ -286,15 +306,31 @@ public class Board extends JPanel {
 
 			numLinesRemoved += numFullLines;
 
-			statusbar.setText(String.valueOf(numLinesRemoved));
+			lineTextField.setText(String.valueOf(numLinesRemoved));
 			isFallingFinished = true;
 			curPiece.setShape(Tetrominoe.NoShape);
 		}
+
+	}
+
+	private void checkMissionSuccess() {
+		int randomTime, randomLines = 0;
 		if (gameOver == false) {
 			if (missionSucces == true) {
-				Thread mission = new Thread(new Mission(parent, 5, 3));
+				missionSuccesCount++;
+				parent.getSuccessCount().setText("Success " + String.valueOf(missionSuccesCount));
+
+				randomTime = 10 * (Math.abs(new Random().nextInt()) % 6 + 2); // 20~70
+				if (randomTime <= 30)
+					randomLines = 1;
+				else if (randomTime > 30 && randomTime <= 50)
+					randomLines = 2;
+				else if (randomTime > 50 && randomTime <= 70)
+					randomLines = 3;
+
+				Thread mission = new Thread(new Mission(parent, this, randomTime, randomLines));
 				mission.start();
-				missionSucces=false;
+				missionSucces = false;
 			}
 		}
 	}
@@ -331,16 +367,21 @@ public class Board extends JPanel {
 	private void doGameCycle() {
 
 		update();
+		checkMissionSuccess();
+		setScore();
 		repaint();
 	}
 
-	private void update() {
+	private void setScore() {
+		score = (100 * numLinesRemoved) + (300 * missionSuccesCount);
+		parent.getScoreTextField().setText(String.valueOf(score));
+	}
 
-		if (isPaused) {
+	private void update() {
+		if (isPaused || gameOver) {
 
 			return;
 		}
-
 		if (isFallingFinished) {
 
 			isFallingFinished = false;

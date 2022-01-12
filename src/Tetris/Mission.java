@@ -1,5 +1,6 @@
 package Tetris;
 
+import java.awt.Color;
 import java.awt.Font;
 
 import javax.swing.*;
@@ -39,6 +40,11 @@ public class Mission implements Runnable {
 			int gab = board.getNumLinesRemoved()-initLines;
 			
 			timeLabel.setText(String.valueOf(time) + "s");
+			if(time<6) {
+				timeLabel.setForeground(Color.red);
+			}else {
+				timeLabel.setForeground(Color.gray.darker());
+			}
 			lineLabel.setText(gab + " / " + String.valueOf(lines));
 			
 			// Mission Success

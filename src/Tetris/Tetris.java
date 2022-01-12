@@ -16,12 +16,14 @@ Website: http://zetcode.com
 public class Tetris extends JFrame  {
 	private static Font boldFont = new Font("Arial", Font.BOLD, 20);
 	private static Font boldSmallFont = new Font("Arial", Font.BOLD, 16);
-	private static Font plaintFont = new Font("Arial", Font.PLAIN, 19);
+	private static Font plainFont = new Font("Arial", Font.PLAIN, 19);
+	private static Font plainSmallFont = new Font("Arial", Font.BOLD, 12);
 	private static Font missionFont = new Font("Arial", Font.BOLD, 24);
 //	private static Font gameOverFont = new Font("Arial", Font.BOLD, 30);
 	private JLabel missionSuccess;
 	public JTextField scoreTextField,lineTextField;
-	public JPanel missionPan;
+	public JPanel missionPan; 
+	public NextTetrominoe nextTetrominoe;
 	public JLabel timeLabel, linesLabel;
 	
 	public Tetris() {
@@ -31,53 +33,96 @@ public class Tetris extends JFrame  {
 	}
 
 	private void initUI() {
-		//Container c = getContentPane();
-		setLayout(null);
+		Container c = getContentPane();
+		c.setLayout(null);
+		c.setBackground(new Color(40,40,80));
+		
+		ImageIcon back = new ImageIcon("block.png");
+		JLabel background = new JLabel(back);
+		background.setBounds(0,0,526, 623);
+		add(background);
+		
+		ImageIcon title = new ImageIcon("title.png");
+		JLabel titlel = new JLabel(title);
+		titlel.setBounds(10,10,390, 372);
+		add(titlel);
 
 		missionSuccess = new JLabel("Success 0 ", JLabel.LEFT);
 		missionSuccess.setFont(boldFont);
-		missionSuccess.setBounds(290,220,120,30);
+		missionSuccess.setForeground(Color.LIGHT_GRAY);
+		missionSuccess.setBounds(322,246,120,30);
 		add(missionSuccess);
 		
 		JLabel score = new JLabel("Score: ", JLabel.LEFT);
 		score.setFont(boldFont);
-		score.setBounds(290,260,80,30);
+		score.setForeground(Color.LIGHT_GRAY);
+		score.setBounds(322,290,80,30);
 		add(score);
 		
 		scoreTextField = new JTextField(7);
 		scoreTextField.setHorizontalAlignment(JTextField.RIGHT);
 		scoreTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		scoreTextField.setFont(plaintFont);
+		scoreTextField.setFont(plainFont);
 		scoreTextField.setText("0");
+		scoreTextField.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.LIGHT_GRAY));
 		scoreTextField.setForeground(Color.white);
 		scoreTextField.setBackground(Color.black);
-		scoreTextField.setBounds(290,295,145,22);
+		scoreTextField.setBounds(322,325,143,26);
 		add(scoreTextField);
 
 		JLabel lines = new JLabel("Lines: ", JLabel.LEFT);
 		lines.setFont(boldFont);
-		lines.setBounds(290,335,80,30);
+		lines.setBounds(322,365,80,30);
+		lines.setForeground(Color.LIGHT_GRAY);
 		add(lines);
 		
 		lineTextField = new JTextField(7);
 		lineTextField.setHorizontalAlignment(JTextField.RIGHT);
 		lineTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		lineTextField.setFont(plaintFont);
+		lineTextField.setFont(plainFont);
 		lineTextField.setText("0");
+		lineTextField.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.LIGHT_GRAY));
 		lineTextField.setForeground(Color.white);
 		lineTextField.setBackground(Color.black);
-		lineTextField.setBounds(290,370,145,22);
+		lineTextField.setBounds(322,400,143,26);
 		add(lineTextField);
+		
+		JLabel l1 = new JLabel("ก็ / กๆ  :    Move", JLabel.RIGHT);
+		l1.setFont(plainSmallFont);
+		l1.setForeground(Color.lightGray);
+		l1.setBounds(365,455,100,30);
+		add(l1);
+		
+		JLabel l2 = new JLabel("ก่  :  Rotate", JLabel.RIGHT);
+		l2.setFont(plainSmallFont);
+		l2.setForeground(Color.lightGray);
+		l2.setBounds(385,475,80,30);
+		add(l2);
+		
+		JLabel l3 = new JLabel(" ก้  :   Down", JLabel.RIGHT);
+		l3.setFont(plainSmallFont);
+		l3.setForeground(Color.lightGray);
+		l3.setBounds(385,495,80,30);
+		add(l3);
+		
+		JLabel l4 = new JLabel(" P  :  Pause", JLabel.RIGHT);
+		l4.setFont(plainSmallFont);
+		l4.setForeground(Color.lightGray);
+		l4.setBounds(385,515,80,30);
+		add(l4);
 
+
+		//mission panel UI
 		missionPan= new JPanel();
 		missionPan.setLayout(null);
-		missionPan.setBounds(290,70,145,140);
-		missionPan.setBackground(Color.LIGHT_GRAY);
+		missionPan.setBounds(320,103,145,140);
+		missionPan.setBackground(new Color(230,230,240));
+		missionPan.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.LIGHT_GRAY));
 		
 		JLabel label1 = new JLabel("MISSION ", JLabel.LEFT);
 		label1.setFont(missionFont);
 		label1.setBounds(20,20,140,30);
-		label1.setForeground(Color.red);
+		label1.setForeground(Color.red.darker());
 		missionPan.add(label1);
 		
 		JLabel label2 = new JLabel("Time ", JLabel.LEFT);
@@ -104,12 +149,16 @@ public class Tetris extends JFrame  {
 		
 		add(missionPan);
 		
+		//tetris board
 		var board = new Board(this);
-		board.setBounds(30,70,230,460);
+		board.setBounds(45,101,230,482);
+		board.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.LIGHT_GRAY));
 		add(board);
 		board.start();
 		
-		setSize(480, 600);
+		setBackground(Color.white);
+		setSize(526, 650);
+		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 	}
@@ -118,10 +167,10 @@ public class Tetris extends JFrame  {
 	public void paintComponents(Graphics g) {
 		// TODO Auto-generated method stub
 		super.paintComponents(g);
-		Graphics2D g2 = (Graphics2D) g;
-		//g2.setColor(Color.black);
-		//g2.setStroke(new BasicStroke(2));
-		//g2.fillRect(290, 70,145,145);
+		
+		//ImageIcon back = new ImageIcon("background.jpg");
+		//g.drawImage(back.getImage(), 0, 40, null);
+	
 	}
 
 	JTextField getLineTextField() {
@@ -144,11 +193,5 @@ public class Tetris extends JFrame  {
 		return linesLabel;
 	}
 
-	public static void main(String[] args) {
-
-		//EventQueue.invokeLater(() -> {
-			var game = new Tetris();
-			game.setVisible(true);
-		//});
-	}
+	
 }

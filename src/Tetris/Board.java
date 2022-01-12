@@ -11,19 +11,21 @@ import java.util.Random;
 public class Board extends JPanel {
 
 	private final int BOARD_WIDTH = 10;
-	private final int BOARD_HEIGHT = 22;
+	private final int BOARD_HEIGHT = 21;
 	private final int PERIOD_INTERVAL = 300;
 
-	private Timer timer;
+	//private Timer timer;
+	private DropTimer timer;
 	private boolean isFallingFinished = false;
 	private boolean gameOver = false;
 	private boolean isPaused = false;
 	private boolean ableRotate = true;
 	private boolean missionSucces = false;
+	private boolean stuckBlock = false;
 	public int missionSuccesCount = 0;
 	public int numLinesRemoved = 0;
-	private int curX = 0;
-	private int curY = 0;
+	public int curX = 0;
+	public int curY = 0;
 	private int score = 0;
 	private Shape curPiece;
 	private Shape nextPiece;
@@ -42,6 +44,7 @@ public class Board extends JPanel {
 		initBoard(parent);
 	}
 
+
 	private void initBoard(Tetris parent) {
 		this.requestFocus();
 		setFocusable(true);
@@ -59,6 +62,10 @@ public class Board extends JPanel {
 
 	public boolean getGameOver() {
 		return gameOver;
+	}
+
+	public Shape getCurPiece() {
+		return curPiece;
 	}
 
 	public void setGameOver(boolean bool) {
@@ -93,7 +100,7 @@ public class Board extends JPanel {
 		clearBoard();
 		newPiece();
 
-		timer = new Timer(PERIOD_INTERVAL, new GameCycle());
+		timer = new DropTimer(this, PERIOD_INTERVAL);
 		timer.start();
 
 		Thread mission = new Thread(new Mission(parent, this, 30, 1));
@@ -108,10 +115,10 @@ public class Board extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		
 		doDrawing(g);
 
 		if (gameOver == true) {
-			doDrawing(g);
 			drawGameOver(g);
 		}
 
@@ -137,6 +144,14 @@ public class Board extends JPanel {
 
 		// draw falling Tetrominoe
 		if (curPiece.getShape() != Tetrominoe.NoShape) {
+			// Randomly rotate StuckShape 1~4 time once
+			if (curPiece.getShape().ordinal() > 7 && stuckBlock) {
+				for (int i = 0; i < Math.abs(new Random().nextInt()) % 4 + 1; i++) {
+					System.out.println("roatete");
+					tryMove(curPiece.rotateRight(), curX, curY);
+				}
+				stuckBlock = false;
+			}
 
 			for (int i = 0; i < 4; i++) {
 
@@ -149,12 +164,32 @@ public class Board extends JPanel {
 			}
 		}
 	}
+	
+	public void drawSquare(Graphics g, int x, int y, Tetrominoe shape) {
+		Color colors[] = { new Color(0, 0, 0), new Color(250, 0, 0), new Color(255, 130, 36), new Color(255, 228, 0),
+				new Color(0, 165, 0), new Color(0, 216, 255), new Color(0, 84, 255), new Color(149, 54, 255),
+				new Color(100, 100, 100), new Color(100, 100, 100), new Color(100, 100, 100), new Color(100, 100, 100),
+				new Color(100, 100, 100), new Color(100, 100, 100), new Color(100, 100, 100) };
+
+		Color color = colors[shape.ordinal()];
+
+		g.setColor(color);
+		g.fillRect(x + 1, y + 1, squareWidth() - 2, squareHeight() - 2);
+
+		g.setColor(Color.black);
+		g.drawLine(x, y + squareHeight() - 1, x, y);
+		g.drawLine(x, y, x + squareWidth() - 1, y);
+
+		g.setColor(color.darker());
+		g.drawLine(x + 1, y + squareHeight() - 1, x + squareWidth() - 1, y + squareHeight() - 1);
+		g.drawLine(x + squareWidth() - 1, y + squareHeight() - 1, x + squareWidth() - 1, y + 1);
+	}
 
 	private void drawGameOver(Graphics g) {
 		g.setColor(new Color(0, 0, 0, 200));
 		g.fillRect(0, 0, getWidth(), getHeight());
 
-		g.setColor(new Color(180, 180, 180, 150));
+		g.setColor(new Color(0, 100, 100, 180));
 		g.fillRect(0, getHeight() / 2 - 35, getWidth(), 70);
 
 		g.setColor(new Color(255, 0, 0));
@@ -162,8 +197,7 @@ public class Board extends JPanel {
 		g.drawString("GAME OVER", 15, (getHeight() / 2) + 10);
 
 		g.fillRect(0, getHeight() / 2 - 42, getWidth(), 7);
-		g.fillRect(0, getHeight() / 2 +  35, getWidth(), 7);
-		
+		g.fillRect(0, getHeight() / 2 + 35, getWidth(), 7);
 
 	}
 
@@ -221,28 +255,24 @@ public class Board extends JPanel {
 
 		curPiece.setRandomShape();
 		int x = curPiece.pieceShape.ordinal();
-		if (x > 8) {
+		if (x > 7) {
 			ableRotate = false;
+			stuckBlock = true;
 		} else {
 			ableRotate = true;
-			// for (int i = 0; i < Math.abs(new Random().nextInt()) % 4; i++)
-			{
-				// curPiece.rotateRight();
-			}
 		}
 
-		tryMove(curPiece.rotateRight(), curX, curY);
-		curX = BOARD_WIDTH / 2 + 1;
+		curX = BOARD_WIDTH / 2;
 		curY = BOARD_HEIGHT - 1 + curPiece.minY();
 
+		// Game Over
 		if (!tryMove(curPiece, curX, curY)) {
 
 			curPiece.setShape(Tetrominoe.NoShape);
-			timer.stop();
+			timer.setStop(true);
 			gameOver = true;
 			repaint();
-			// var msg = String.format("Game over. Score: %d", numLinesRemoved);
-			// statusbar.setText(msg);
+
 		}
 	}
 
@@ -313,68 +343,49 @@ public class Board extends JPanel {
 
 	}
 
-	private void checkMissionSuccess() {
-		int randomTime, randomLines = 0;
-		if (gameOver == false) {
-			if (missionSucces == true) {
-				missionSuccesCount++;
-				parent.getSuccessCount().setText("Success " + String.valueOf(missionSuccesCount));
-
-				randomTime = 10 * (Math.abs(new Random().nextInt()) % 6 + 2); // 20~70
-				if (randomTime <= 30)
-					randomLines = 1;
-				else if (randomTime > 30 && randomTime <= 50)
-					randomLines = 2;
-				else if (randomTime > 50 && randomTime <= 70)
-					randomLines = 3;
-
-				Thread mission = new Thread(new Mission(parent, this, randomTime, randomLines));
-				mission.start();
-				missionSucces = false;
-			}
+	public class DropTimer extends Thread {
+		Board board;
+		int time;
+		boolean stop=false;
+		
+		public DropTimer(Board board, int time) {
+			this.board=board;
+			this.time = time;
+			
 		}
-	}
-
-	private void drawSquare(Graphics g, int x, int y, Tetrominoe shape) {
-		Color colors[] = { new Color(0, 0, 0), new Color(250, 0, 0), new Color(255, 130, 36), new Color(255, 228, 0),
-				new Color(0, 165, 0), new Color(0, 216, 255), new Color(0, 84, 255), new Color(149, 54, 255),
-				new Color(100, 100, 100), new Color(100, 100, 100), new Color(100, 100, 100), new Color(100, 100, 100),
-				new Color(100, 100, 100), new Color(100, 100, 100), new Color(100, 100, 100) };
-
-		Color color = colors[shape.ordinal()];
-
-		g.setColor(color);
-		g.fillRect(x + 1, y + 1, squareWidth() - 2, squareHeight() - 2);
-
-		g.setColor(Color.black);
-		g.drawLine(x, y + squareHeight() - 1, x, y);
-		g.drawLine(x, y, x + squareWidth() - 1, y);
-
-		g.setColor(color.darker());
-		g.drawLine(x + 1, y + squareHeight() - 1, x + squareWidth() - 1, y + squareHeight() - 1);
-		g.drawLine(x + squareWidth() - 1, y + squareHeight() - 1, x + squareWidth() - 1, y + 1);
-	}
-
-	public class GameCycle implements ActionListener {
+		
+		public void setStop(boolean bool) {
+			stop = bool;
+		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void run() {
+			while(!stop) {
+			//new GameCycle();
+				doGameCycle();
+			try {
+				Thread.sleep(time);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			}
+		}
 
+	}
+	/*
+	public class GameCycle  {
+		public GameCycle() {
 			doGameCycle();
 		}
 	}
-
+	*/
 	private void doGameCycle() {
 
 		update();
 		checkMissionSuccess();
 		setScore();
 		repaint();
-	}
-
-	private void setScore() {
-		score = (100 * numLinesRemoved) + (300 * missionSuccesCount);
-		parent.getScoreTextField().setText(String.valueOf(score));
 	}
 
 	private void update() {
@@ -391,7 +402,34 @@ public class Board extends JPanel {
 			oneLineDown();
 		}
 	}
+	
+	private void checkMissionSuccess() {
+		int randomTime, randomLines = 0;
+		if (gameOver == false) {
+			if (missionSucces == true) {
+				missionSuccesCount++;
+				parent.getSuccessCount().setText("Success " + String.valueOf(missionSuccesCount));
+				
+				randomTime = 10 * (Math.abs(new Random().nextInt()) % 6 + 2); // 20~70
+				if (randomTime <= 30)
+					randomLines = 1;
+				else if (randomTime > 30 && randomTime <= 50)
+					randomLines = 2;
+				else if (randomTime > 50 && randomTime <= 70)
+					randomLines = 3;
+				
+				Thread mission = new Thread(new Mission(parent, this, randomTime, randomLines));
+				mission.start();
+				missionSucces = false;
+			}
+		}
+	}
 
+	private void setScore() {
+		score = (100 * numLinesRemoved) + (300 * missionSuccesCount);
+		parent.getScoreTextField().setText(String.valueOf(score));
+	}
+	
 	class TAdapter extends KeyAdapter {
 
 		@Override
@@ -404,7 +442,6 @@ public class Board extends JPanel {
 
 			int keycode = e.getKeyCode();
 
-			// Java 12 switch expressions
 			switch (keycode) {
 
 			case KeyEvent.VK_P:

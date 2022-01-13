@@ -6,12 +6,7 @@
   + 기본 테트리스 게임 룰에 특정 시간 내에 주어진 개수만큼의 열을 깨야하는 미션을 추가했다.
     + 시작과 동시에 Mission Thread가 생성, 동작한다.
     + 미션을 클리어하면 종료 후 연이어 새로운 Mission Thread가 생성 동작하기를 게임 종료까지 반복 한다.
-  + 블록 종류 
----
-+ GameOver 조건
-  + 블록이 끝까지 쌓였을 때
-  + 미션을 시간 내에 수행하지 못했을 때
-![gamovercase](https://user-images.githubusercontent.com/89013431/149329579-84267c17-fe03-48a4-bf4e-a11f4d5ed0cc.JPG)
 
-+ 참고한 오픈소스: 
-[tetris](https://zetcode.com/gfx/java2d/tetris/)
+
+참고한 오픈소스: 
+[https://zetcode.com/gfx/java2d/tetris/](https://zetcode.com/gfx/java2d/tetris/)

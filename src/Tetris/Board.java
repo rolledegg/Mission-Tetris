@@ -14,25 +14,23 @@ public class Board extends JPanel {
 	private final int BOARD_HEIGHT = 21;
 	private final int PERIOD_INTERVAL = 300;
 
-	//private Timer timer;
 	private DropTimer timer;
 	private boolean isFallingFinished = false;
-	private boolean gameOver = false;
+	private boolean isGameOver = false;
 	private boolean isPaused = false;
 	private boolean ableRotate = true;
-	private boolean missionSucces = false;
-	private boolean stuckBlock = false;
-	public int missionSuccesCount = 0;
-	public int numLinesRemoved = 0;
-	public int curX = 0;
-	public int curY = 0;
+	private boolean isMissionSucces = false;
+	private boolean isStuck = false;
+	private int missionSuccesCount = 0;
+	private int numLinesRemoved = 0;
+	private int curX = 0;
+	private int curY = 0;
 	private int score = 0;
 	private Shape curPiece;
-	private Shape nextPiece;
 
 	private Tetris parent;
 	private JTextField lineTextField, scoreTextField;
-	private JLabel successCount;
+	private JLabel successCountLabel;
 
 	private Tetrominoe[] board;
 
@@ -51,7 +49,7 @@ public class Board extends JPanel {
 		setBackground(Color.black);
 		lineTextField = parent.getLineTextField();
 		scoreTextField = parent.getScoreTextField();
-		successCount = parent.getSuccessCount();
+		successCountLabel = parent.getSuccessCount();
 
 		addKeyListener(new TAdapter());
 	}
@@ -61,7 +59,7 @@ public class Board extends JPanel {
 	}
 
 	public boolean getGameOver() {
-		return gameOver;
+		return isGameOver;
 	}
 
 	public Shape getCurPiece() {
@@ -69,13 +67,14 @@ public class Board extends JPanel {
 	}
 
 	public void setGameOver(boolean bool) {
-		gameOver = bool;
+		isGameOver = bool;
 	}
 
 	public void setMissionSucces(boolean bool) {
-		missionSucces = bool;
+		isMissionSucces = bool;
 	}
-
+	
+	
 	private int squareWidth() {
 
 		return (int) getSize().getWidth() / BOARD_WIDTH;
@@ -92,9 +91,7 @@ public class Board extends JPanel {
 	}
 
 	void start() {
-		nextPiece = new Shape();
 		curPiece = new Shape();
-		curPiece = nextPiece;
 		board = new Tetrominoe[BOARD_WIDTH * BOARD_HEIGHT];
 
 		clearBoard();
@@ -118,7 +115,7 @@ public class Board extends JPanel {
 		
 		doDrawing(g);
 
-		if (gameOver == true) {
+		if (isGameOver == true) {
 			drawGameOver(g);
 		}
 
@@ -145,12 +142,12 @@ public class Board extends JPanel {
 		// draw falling Tetrominoe
 		if (curPiece.getShape() != Tetrominoe.NoShape) {
 			// Randomly rotate StuckShape 1~4 time once
-			if (curPiece.getShape().ordinal() > 7 && stuckBlock) {
+			if (curPiece.getShape().ordinal() > 7 && isStuck) {
 				for (int i = 0; i < Math.abs(new Random().nextInt()) % 4 + 1; i++) {
-					System.out.println("roatete");
+					System.out.println("roatete"+i);
 					tryMove(curPiece.rotateRight(), curX, curY);
 				}
-				stuckBlock = false;
+				isStuck = false;
 			}
 
 			for (int i = 0; i < 4; i++) {
@@ -165,6 +162,7 @@ public class Board extends JPanel {
 		}
 	}
 	
+	//draw one square
 	public void drawSquare(Graphics g, int x, int y, Tetrominoe shape) {
 		Color colors[] = { new Color(0, 0, 0), new Color(250, 0, 0), new Color(255, 130, 36), new Color(255, 228, 0),
 				new Color(0, 165, 0), new Color(0, 216, 255), new Color(0, 84, 255), new Color(149, 54, 255),
@@ -257,7 +255,7 @@ public class Board extends JPanel {
 		int x = curPiece.pieceShape.ordinal();
 		if (x > 7) {
 			ableRotate = false;
-			stuckBlock = true;
+			isStuck = true;
 		} else {
 			ableRotate = true;
 		}
@@ -270,7 +268,7 @@ public class Board extends JPanel {
 
 			curPiece.setShape(Tetrominoe.NoShape);
 			timer.setStop(true);
-			gameOver = true;
+			isGameOver = true;
 			repaint();
 
 		}
@@ -361,25 +359,24 @@ public class Board extends JPanel {
 		@Override
 		public void run() {
 			while(!stop) {
-			//new GameCycle();
-				doGameCycle();
-			try {
-				Thread.sleep(time);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+				new GameCycle();
+				
+				//control the speed of a Tetrominoe falling
+				try {
+					Thread.sleep(time);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-
 	}
-	/*
+
 	public class GameCycle  {
 		public GameCycle() {
 			doGameCycle();
 		}
 	}
-	*/
+
 	private void doGameCycle() {
 
 		update();
@@ -389,7 +386,7 @@ public class Board extends JPanel {
 	}
 
 	private void update() {
-		if (isPaused || gameOver) {
+		if (isPaused || isGameOver) {
 
 			return;
 		}
@@ -405,8 +402,8 @@ public class Board extends JPanel {
 	
 	private void checkMissionSuccess() {
 		int randomTime, randomLines = 0;
-		if (gameOver == false) {
-			if (missionSucces == true) {
+		if (isGameOver == false) {
+			if (isMissionSucces == true) {
 				missionSuccesCount++;
 				parent.getSuccessCount().setText("Success " + String.valueOf(missionSuccesCount));
 				
@@ -420,7 +417,7 @@ public class Board extends JPanel {
 				
 				Thread mission = new Thread(new Mission(parent, this, randomTime, randomLines));
 				mission.start();
-				missionSucces = false;
+				isMissionSucces = false;
 			}
 		}
 	}
@@ -436,7 +433,6 @@ public class Board extends JPanel {
 		public void keyPressed(KeyEvent e) {
 
 			if (curPiece.getShape() == Tetrominoe.NoShape) {
-
 				return;
 			}
 

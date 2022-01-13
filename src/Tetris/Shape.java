@@ -23,15 +23,16 @@ public class Shape {
 
 		coords = new int[4][2];
 
-		coordsTable = new int[][][] { { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
+		coordsTable = new int[][][] { { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },//NoShape
 				{ { 0, -1 }, { 0, 0 }, { -1, 0 }, { -1, 1 } }, // SShape
 				{ { 0, -1 }, { 0, 0 }, { 1, 0 }, { 1, 1 } }, // ZShape
-				{ { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } }, // LineShape
+				{ { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } }, // MirroredLShape
 				{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } }, // TShape
 				{ { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // SquareShape
-				{ { -1, -1 }, { 0, -1 }, { 0, 0 }, { 0, 1 } }, // MirroredLShape
+				{ { -1, -1 }, { 0, -1 }, { 0, 0 }, { 0, 1 } }, // LineShape 
 				{ { 1, -1 }, { 0, -1 }, { 0, 0 }, { 0, 1 } }, // LShape
-				{ { 0, -1 }, { 0, 0 }, { -1, 0 }, { -1, 1 } }, // repeat again
+				// repeat again for stuck Tetrominoe (unable to rotate)
+				{ { 0, -1 }, { 0, 0 }, { -1, 0 }, { -1, 1 } }, 
 				{ { 0, -1 }, { 0, 0 }, { 1, 0 }, { 1, 1 } }, 
 				{ { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } }, 
 				{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } }, 
@@ -45,9 +46,7 @@ public class Shape {
 	protected void setShape(Tetrominoe shape) {
 
 		for (int i = 0; i < 4; i++) {
-
 			for (int j = 0; j < 2; ++j) {
-
 				coords[i][j] = coordsTable[shape.ordinal()][i][j];
 			}
 		}
@@ -76,7 +75,6 @@ public class Shape {
 	}
 
 	public void setRandomShape() {
-
 		int x = Math.abs(new Random().nextInt()) % 8 + 1;
 
 		Tetrominoe[] values = Tetrominoe.values();
@@ -93,7 +91,6 @@ public class Shape {
 		int m = coords[0][0];
 
 		for (int i = 0; i < 4; i++) {
-
 			m = Math.min(m, coords[i][0]);
 		}
 
@@ -105,7 +102,6 @@ public class Shape {
 		int m = coords[0][1];
 
 		for (int i = 0; i < 4; i++) {
-
 			m = Math.min(m, coords[i][1]);
 		}
 

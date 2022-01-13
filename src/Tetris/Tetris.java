@@ -16,25 +16,24 @@ Website: http://zetcode.com
 public class Tetris extends JFrame  {
 	private static Font boldFont = new Font("Arial", Font.BOLD, 20);
 	private static Font boldSmallFont = new Font("Arial", Font.BOLD, 16);
+	private static Font boldMoreSmallFont = new Font("Arial", Font.BOLD, 12);
 	private static Font plainFont = new Font("Arial", Font.PLAIN, 19);
-	private static Font plainSmallFont = new Font("Arial", Font.BOLD, 12);
 	private static Font missionFont = new Font("Arial", Font.BOLD, 24);
-//	private static Font gameOverFont = new Font("Arial", Font.BOLD, 30);
 	private JLabel missionSuccess;
-	public JTextField scoreTextField,lineTextField;
-	public JPanel missionPan; 
-	public NextTetrominoe nextTetrominoe;
-	public JLabel timeLabel, linesLabel;
+	private JTextField scoreTextField,lineTextField;
+	private JPanel missionPan; 
+	private NextTetrominoe nextTetrominoe;
+	private JLabel timeLabel, linesLabel;
 	
 	public Tetris() {
 		super("OPP Project : MISSION TETRIS");
-		//setFocusable(true);
 		initUI();
 	}
 
 	private void initUI() {
 		Container c = getContentPane();
 		c.setLayout(null);
+		//set backgroundUI
 		c.setBackground(new Color(40,40,80));
 		
 		ImageIcon back = new ImageIcon("block.png");
@@ -46,7 +45,8 @@ public class Tetris extends JFrame  {
 		JLabel titlel = new JLabel(title);
 		titlel.setBounds(10,10,390, 372);
 		add(titlel);
-
+		
+		//set Jlabel and JtextField in AbsoluteLayout
 		missionSuccess = new JLabel("Success 0 ", JLabel.LEFT);
 		missionSuccess.setFont(boldFont);
 		missionSuccess.setForeground(Color.LIGHT_GRAY);
@@ -88,25 +88,25 @@ public class Tetris extends JFrame  {
 		add(lineTextField);
 		
 		JLabel l1 = new JLabel("ก็ / กๆ  :    Move", JLabel.RIGHT);
-		l1.setFont(plainSmallFont);
+		l1.setFont(boldMoreSmallFont);
 		l1.setForeground(Color.lightGray);
 		l1.setBounds(365,455,100,30);
 		add(l1);
 		
 		JLabel l2 = new JLabel("ก่  :  Rotate", JLabel.RIGHT);
-		l2.setFont(plainSmallFont);
+		l2.setFont(boldMoreSmallFont);
 		l2.setForeground(Color.lightGray);
 		l2.setBounds(385,475,80,30);
 		add(l2);
 		
 		JLabel l3 = new JLabel(" ก้  :   Down", JLabel.RIGHT);
-		l3.setFont(plainSmallFont);
+		l3.setFont(boldMoreSmallFont);
 		l3.setForeground(Color.lightGray);
 		l3.setBounds(385,495,80,30);
 		add(l3);
 		
 		JLabel l4 = new JLabel(" P  :  Pause", JLabel.RIGHT);
-		l4.setFont(plainSmallFont);
+		l4.setFont(boldMoreSmallFont);
 		l4.setForeground(Color.lightGray);
 		l4.setBounds(385,515,80,30);
 		add(l4);
@@ -116,7 +116,7 @@ public class Tetris extends JFrame  {
 		missionPan= new JPanel();
 		missionPan.setLayout(null);
 		missionPan.setBounds(320,103,145,140);
-		missionPan.setBackground(new Color(230,230,240));
+		missionPan.setBackground(new Color(255,255,255));
 		missionPan.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.LIGHT_GRAY));
 		
 		JLabel label1 = new JLabel("MISSION ", JLabel.LEFT);
@@ -156,21 +156,10 @@ public class Tetris extends JFrame  {
 		add(board);
 		board.start();
 		
-		setBackground(Color.white);
 		setSize(526, 650);
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-	}
-	
-	@Override
-	public void paintComponents(Graphics g) {
-		// TODO Auto-generated method stub
-		super.paintComponents(g);
-		
-		//ImageIcon back = new ImageIcon("background.jpg");
-		//g.drawImage(back.getImage(), 0, 40, null);
-	
 	}
 
 	JTextField getLineTextField() {
@@ -192,6 +181,10 @@ public class Tetris extends JFrame  {
 	JLabel getLineLabel() {
 		return linesLabel;
 	}
-
+	
+	@Override
+	public void paintComponents(Graphics g) {
+		super.paintComponents(g);
+	}
 	
 }

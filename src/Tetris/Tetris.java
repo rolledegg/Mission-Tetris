@@ -17,7 +17,6 @@ public class Tetris extends JFrame  {
 	private JLabel missionSuccess;
 	private JTextField scoreTextField,lineTextField;
 	private JPanel missionPan; 
-	private NextTetrominoe nextTetrominoe;
 	private JLabel timeLabel, linesLabel;
 	
 	public Tetris() {

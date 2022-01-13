@@ -31,6 +31,7 @@ public class Shape {
 				{ { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // SquareShape
 				{ { -1, -1 }, { 0, -1 }, { 0, 0 }, { 0, 1 } }, // LineShape 
 				{ { 1, -1 }, { 0, -1 }, { 0, 0 }, { 0, 1 } }, // LShape
+				
 				// repeat again for stuck Tetrominoe (unable to rotate)
 				{ { 0, -1 }, { 0, 0 }, { -1, 0 }, { -1, 1 } }, 
 				{ { 0, -1 }, { 0, 0 }, { 1, 0 }, { 1, 1 } }, 
@@ -75,9 +76,10 @@ public class Shape {
 	}
 
 	public void setRandomShape() {
-		int x = Math.abs(new Random().nextInt()) % 8 + 1;
-
 		Tetrominoe[] values = Tetrominoe.values();
+		
+		//Stuck tetrominoe is set with a one-eighth chance
+		int x = Math.abs(new Random().nextInt()) % 8 + 1;
 		if (x == 8) {
 			int y = Math.abs(new Random().nextInt()) % 7 ;
 			setShape(values[x+y]);

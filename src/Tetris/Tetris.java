@@ -8,11 +8,6 @@ import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
-/*
-Java Tetris game clone
-Author: Jan Bodnar
-Website: http://zetcode.com
- */
 public class Tetris extends JFrame  {
 	private static Font boldFont = new Font("Arial", Font.BOLD, 20);
 	private static Font boldSmallFont = new Font("Arial", Font.BOLD, 16);
@@ -64,6 +59,7 @@ public class Tetris extends JFrame  {
 		scoreTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		scoreTextField.setFont(plainFont);
 		scoreTextField.setText("0");
+		scoreTextField.setEditable(false);
 		scoreTextField.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.LIGHT_GRAY));
 		scoreTextField.setForeground(Color.white);
 		scoreTextField.setBackground(Color.black);
@@ -81,6 +77,7 @@ public class Tetris extends JFrame  {
 		lineTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		lineTextField.setFont(plainFont);
 		lineTextField.setText("0");
+		lineTextField.setEditable(false);
 		lineTextField.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.LIGHT_GRAY));
 		lineTextField.setForeground(Color.white);
 		lineTextField.setBackground(Color.black);

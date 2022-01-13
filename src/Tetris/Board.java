@@ -145,7 +145,7 @@ public class Board extends JPanel {
 			if (curPiece.getShape().ordinal() > 7 && isStuck) {
 				for (int i = 0; i < Math.abs(new Random().nextInt()) % 4 + 1; i++) {
 					System.out.println("roatete"+i);
-					tryMove(curPiece.rotateRight(), curX, curY);
+					curPiece = curPiece.rotateRight();
 				}
 				isStuck = false;
 			}
